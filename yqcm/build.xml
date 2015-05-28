@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE project>
+<project name="yqcm" default="build" basedir=".">
+	<property name="build" value="build" />
+	<property name="src" value="src" />
+	<property name="dist" value="dist" />
+	<property name="web" value="web" />
+	<property name="classes" value="build/classes" />
+	<patternset id="jar.files">
+		<include name="**/*.xml" />
+		<include name="**/*.properties" />
+		<include name="**/*.property" />
+		<include name="**/*.vm" />
+		<include name="**/*.ccf" />
+		<!-- exclude everything we don't want in the jar -->
+		<exclude name="META-INF/ra.xml" />
+	</patternset>
+
+	<path id="class.path">
+		<fileset dir="${web}/WEB-INF/lib">
+			<include name="**/*.jar" />
+		</fileset>
+	</path>
+
+	<target name="init">
+		<delete dir="${classes}" />
+		<delete dir="${dist}" />
+		<mkdir dir="${dist}" />
+		<mkdir dir="${classes}" />
+		<copy todir="${classes}">
+			<fileset dir="${src}">
+				<patternset refid="jar.files" />
+			</fileset>
+		</copy>
+	</target>
+
+	<target name="compile" depends="init">
+		<javac srcdir="${src}" destdir="${classes}">
+			<classpath refid="class.path" />
+		</javac>
+	</target>
+	<target name="build" depends="compile">
+		<jar jarfile="${dist}/yqcm.jar" basedir="${classes}" />
+		<copy todir="${build}">
+			<fileset dir="${web}" />
+		</copy>
+		<copy todir="${build}/WEB-INF/lib">
+			<fileset file="${dist}/yqcm.jar" />
+		</copy>
+		<copy todir="${web}/WEB-INF/lib">
+			<fileset file="${dist}/yqcm.jar" />
+		</copy>
+		<delete dir="${build}/WEB-INF/classes" />
+		<delete dir="${web}/WEB-INF/classes" />
+	</target>
+
+	<target name="clean">
+		<delete dir="${build}" />
+	</target>
+	
+	<target name="run">
+	   <java classname="com.jrj.yqcm.Main" classpath="${dist}/yqcm.jar"/>
+	</target>	
+</project>
